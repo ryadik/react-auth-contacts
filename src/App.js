@@ -1,19 +1,46 @@
-import React from 'react';
-import './index.css'
+import React, {Component} from 'react';
+import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 
-function App() {
-  return (
-    <div className="App">
-      <div className="max-w-sm mx-auto flex p-6 bg-white rounded-lg shadow-xl">
-        <div className="flex-shrink-0">
-        </div>
-        <div className="ml-6 pt-1">
-          <h4 className="text-xl text-gray-900 leading-tight">ChitChat</h4>
-          <p className="text-base text-gray-600 leading-normal">You have a new message!</p>
-        </div>
+import AuthPage from "./components/pages/auth-page/auth-page";
+import ContactsPage from "./components/pages/contacts-page/contacts-page";
+import getData from "./service/getData";
+
+class App extends Component{
+
+  state = {
+    correctData: false
+  }
+
+  conditionData = (loginField, passwordField, e) => {
+    e.preventDefault()
+
+    const url = 'http://localhost:3002/users'
+
+    getData(url)
+      .then(res => res.body)
+      .then(body => {
+        body.forEach(item => {
+          if (loginField === item.login && passwordField === item.password) {
+            this.setState({correctData: true})
+          }
+        })
+      })
+  }
+
+  render() {
+    return (
+      <div className="App container mx-auto px-3">
+        <Router>
+          <Switch>
+            <Route exact path="/">
+              {this.state.correctData ? <Redirect to="/cabinet"/> : <AuthPage conditionData={this.conditionData}/>}
+            </Route>
+            <Route path="/cabinet" component={ContactsPage}/>
+          </Switch>
+        </Router>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default App;
