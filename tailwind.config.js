@@ -11,6 +11,15 @@ module.exports = {
       lg: '1024px',
       xl: '1280px',
     },
+
+    extend: {
+      spacing: {
+        '72': '18rem',
+        '84': '21rem',
+        '96': '24rem',
+      }
+    },
+
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
