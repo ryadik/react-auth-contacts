@@ -1,12 +1,21 @@
 import React, {Component} from "react";
 
-import getData from "../../../service/getData";
+import VisualComposition from "./visual-composition/visual-composition";
 import ContactsItem from "./contacts-item/contacts-item";
+import ViewSelectedContact from "./view-selected-contact/view-selected-contact";
+
+import getData from "../../../service/getData";
+import generateKey from "../../../service/generateKey";
 
 export default class ContactsPage extends Component {
 
   state = {
-    contacts: []
+    contacts: [
+      {id: '1', firstName: 'Some', secondName: 'User1', img: '', active: false, key: generateKey()},
+      {id: '2', firstName: 'Some', secondName: 'User2', img: '', active: false, key: generateKey()},
+      {id: '3', firstName: 'Some', secondName: 'User3', img: '', active: false, key: generateKey()},
+      {id: '4', firstName: 'Some', secondName: 'User4', img: '', active: false, key: generateKey()},
+    ]
   }
 
   getContacts = () => {
@@ -21,7 +30,27 @@ export default class ContactsPage extends Component {
       })
   }
 
-  generateKey = () => Math.random().toString(36).substr(6)
+  setContactActive = (key) => {
+    this.setState(({contacts}) => {
+      const newArr = [...contacts]
+
+      newArr.forEach(item => {
+        item.active = (item.key === key) ? item.active = true : item.active = false
+      })
+
+      return {
+        contacts: newArr
+      }
+    })
+  }
+
+  onDeleteContact = (key) => {
+    this.setState(({contacts}) => {
+      return {
+        contacts: contacts.filter(item => item.key !== key)
+      }
+    })
+  }
 
   componentDidMount() {
     this.getContacts()
@@ -34,58 +63,27 @@ export default class ContactsPage extends Component {
   render() {
     const {contacts} = this.state
 
-    const elems = (contacts.length > 0) ? contacts.map(item => <ContactsItem
-        key={this.generateKey()}
+    const contactsElems = (contacts.length > 0) ? contacts.map(item => <ContactsItem
+        id={item.key}
+        key={item.key}
         imgAvatar={item.img.trim()}
-        fullName={`${item.firstName} ${item.secondName}`}/>)
+        fullName={`${item.firstName} ${item.secondName}`}
+        setContactActive={this.setContactActive}/>)
       : []
 
-    return <MainViewElements contacts={elems}/>
+    const selectedElem = []
+
+    contacts.forEach(item => {
+      if (item.active) {
+        selectedElem.push(<ViewSelectedContact key={generateKey(6)}
+                                               id={item.key}
+                                               imgAvatar={item.img.trim()}
+                                               firstName={item.firstName}
+                                               secondName={item.secondName}
+                                               onDeleteContact={this.onDeleteContact}/>)
+      }
+    })
+
+    return <VisualComposition contacts={contactsElems} selected={selectedElem}/>
   }
-
-}
-
-const EmptyContacts = () => {
-  return (
-    <button
-      className="box-border px-4 py-3 mx-auto bg-blue-500 hover:bg-blue-600 active:border-none rounded text-white text-center font-bold"
-    >
-      Добавить контакт
-    </button>
-  )
-}
-
-const NonEmptyContacts = ({contacts}) => {
-  return (
-    <>
-      {contacts}
-    </>
-  )
-}
-
-const MainViewElements = ({contacts}) => {
-
-  const contactsView = (contacts.length > 0) ? <NonEmptyContacts contacts={contacts} /> : <EmptyContacts/>
-  const contactsContainerClassList =
-    (contacts.length === 0) ? 'h-full flex justify-center items-center divide-y divide-gray-400' : ''
-
-  return (
-    <div className="contacts-page mt-32 px-4 py-4 flex justify-between shadow-md bg-gray-200">
-      <aside className="w-1/4 pr-4" style={{
-        borderRight: '1px solid #a0aec0',
-        minHeight: '600px'
-      }}>
-        <h3 className="text-2xl">Контакты</h3>
-
-        <div className={`contacts-container ${contactsContainerClassList}`}>
-          {contactsView}
-        </div>
-
-      </aside>
-
-      <article className="w-3/4 pl-4">
-        <h3 className="text-2xl">Подробнее</h3>
-      </article>
-    </div>
-  )
 }
