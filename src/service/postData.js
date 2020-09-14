@@ -1,12 +1,14 @@
-const postData = async (url, body) => {
-  const res = await fetch('http://localhost:3002/users', {
-    method: 'POST',
+const postData = async (url, body, method) => {
+
+  const res = await fetch(url, {
+    method,
+    body: JSON.stringify(body),
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(body)
   })
 
   if (!res.ok) {
     return {
+      res,
       code: res.status,
       status: 'Error'
     }
