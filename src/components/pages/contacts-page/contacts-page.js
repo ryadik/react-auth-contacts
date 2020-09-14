@@ -1,8 +1,7 @@
-import React, {Component} from "react";
+import React, {Component, useState} from "react";
 
 import VisualComposition from "./visual-composition/visual-composition";
 import ContactsItem from "./visual-composition/contacts-item/contacts-item";
-import CreateContact from "./visual-composition/contacts-item/create-contact/create-contact";
 import ViewSelectedContact from "./visual-composition/view-selected-contact/view-selected-contact";
 
 import getData from "../../../service/getData";
@@ -30,9 +29,28 @@ export default class ContactsPage extends Component {
     })
   } // set contact active state
 
-
-
   // CRUD JSON
+  createNewContact = async (contactData, e) => {
+    e.preventDefault()
+
+    const urlPost = 'http://localhost:3002/contacts/'
+
+    const newContact = {
+      id: this.state.contacts.length + 1,
+      ...contactData,
+      active: false,
+      key: generateKey(6)
+    }
+
+    newContact.firstName = (newContact.firstName.length > 20) ? newContact.firstName.substring(0,15) : newContact.firstName
+    newContact.secondName = (newContact.secondName.length > 20) ? newContact.secondName.substring(0, 15) : newContact.secondName
+
+    await postData(urlPost, newContact, 'POST')
+      .then(res => console.log(res))
+
+    this.getContacts()
+  } // C
+
   getContacts = () => {
     const url = 'http://localhost:3002/contacts'
 
@@ -43,8 +61,7 @@ export default class ContactsPage extends Component {
           this.setState({contacts: body})
         }
       })
-      .then(() => console.log(this.state))
-  } // query to db.json GET
+  } // query to db.json GET // R
 
   saveContactChanges = async (key, newData, e) => {
     e.preventDefault()
@@ -55,7 +72,7 @@ export default class ContactsPage extends Component {
       .then(res => console.log('Post:', res))
 
     this.getContacts()
-  } // save changed element
+  } // save changed element // U
 
   onDeleteContact = (key) => {
     let url = 'http://localhost:3002/contacts/'
@@ -69,7 +86,7 @@ export default class ContactsPage extends Component {
         contacts: contacts.filter(item => item.key !== key)
       }
     })
-  } // delete contact
+  } // delete contact // D
 
   componentDidMount() {
     this.getContacts()
@@ -78,13 +95,15 @@ export default class ContactsPage extends Component {
   render() {
     const {contacts} = this.state
 
-    const contactsElems = (contacts.length > 0) ? contacts.map(item => <ContactsItem
-        id={item.key}
-        key={item.key}
-        imgAvatar={item.imgAvatar.trim()}
-        fullName={`${item.firstName} ${item.secondName}`}
-        setContactActive={this.setContactActive}/>)
-      : <CreateContact/>
+    const contactsElems = (contacts.length > 0) ? contacts.map(item =>
+        <ContactsItem id={item.key}
+                      key={item.key}
+                      imgAvatar={item.imgAvatar.trim()}
+                      fullName={`${item.firstName} ${item.secondName}`}
+                      viewMode={true}
+                      setContactActive={this.setContactActive}/>)
+
+      : null
 
     const selectedElem = []
 
@@ -102,6 +121,6 @@ export default class ContactsPage extends Component {
       }
     })
 
-    return <VisualComposition contacts={contactsElems} selected={selectedElem}/>
+    return <VisualComposition createNewContact={this.createNewContact} contacts={contactsElems} selected={selectedElem}/>
   }
 }
