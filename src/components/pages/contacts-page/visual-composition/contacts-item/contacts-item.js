@@ -1,6 +1,6 @@
 import React from 'react'
 
-import userAvatar from '../../../../user-avatar.webp'
+import userAvatar from '../../../../../user-avatar.webp'
 
 const ContactsItem = ({imgAvatar, fullName, id, setContactActive}) => {
   return (
