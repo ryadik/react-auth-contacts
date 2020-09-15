@@ -4,11 +4,6 @@
       "id": "1",
       "login": "admin",
       "password": "root"
-    },
-    {
-      "id": "2",
-      "login": "user",
-      "password": "1234"
     }
   ],
   "contacts": []
