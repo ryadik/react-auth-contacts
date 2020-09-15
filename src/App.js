@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
+import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 
 import AuthPage from "./components/pages/auth-page/auth-page";
 import ContactsPage from "./components/pages/contacts-page/contacts-page";
@@ -8,24 +8,29 @@ import getData from "./service/getData";
 class App extends Component{
 
   state = {
-    correctData: false
+    correctData: false,
+    isLogin: false
   }
 
-  conditionData = (loginField, passwordField, e) => {
+  conditionData = async (loginField, passwordField, e) => {
     e.preventDefault()
 
     const url = 'http://localhost:3002/users'
 
-    getData(url)
+    await getData(url)
       .then(res => res.body)
       .then(body => {
         body.forEach(item => {
           if (loginField === item.login && passwordField === item.password) {
-            this.setState({correctData: true})
+            this.setState({correctData: true, isLogin: true})
+          } else {
+            return false
           }
         })
       })
   }
+
+  onLogout = () => {this.setState({isLogin: false})}
 
   render() {
     return (
@@ -33,9 +38,11 @@ class App extends Component{
         <Router>
           <Switch>
             <Route exact path="/">
-              {this.state.correctData ? <Redirect to="/cabinet"/> : <AuthPage conditionData={this.conditionData}/>}
+              <AuthPage conditionData={this.conditionData} isLogin={this.state.isLogin}/>
             </Route>
-            <Route path="/cabinet" component={ContactsPage}/>
+            <Route path="/cabinet">
+              <ContactsPage isLogin={this.state.isLogin} onLogout={this.onLogout}/>
+            </Route>
           </Switch>
         </Router>
       </div>
