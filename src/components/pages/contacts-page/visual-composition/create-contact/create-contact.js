@@ -40,7 +40,7 @@ class CreateContact extends Component{
                  type="text" id="secondName" placeholder="Введите фамилию"/>
           <input className={inputStyle}
                  onChange={(e) => this.changeState('imgAvatar', e)}
-                 type="url" id="imgAvatar" placeholder="Введите ссылку"/>
+                 type="url" id="imgAvatar" placeholder="Ссылка на картинку"/>
         </div>
 
         <div className="edit-form__buttons mt-8">
