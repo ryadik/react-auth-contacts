@@ -2,9 +2,9 @@ import React from "react";
 
 import userAvatar from "../../../../../../user-avatar.webp";
 
-const ViewMode = ({imgAvatar, fullName, id, setContactActive}) => {
+const ViewMode = ({imgAvatar, fullName, id, setContactToggleActive}) => {
   return (
-    <div onClick={() => setContactActive(id)} className="contacts-item w-full h-20 flex items-center cursor-pointer">
+    <div onClick={() => setContactToggleActive(id)} className="contacts-item w-full h-20 flex items-center cursor-pointer">
       <div className="contacts-item__avatar ml-2 mr-6">
         <img
           className="w-12 rounded-full"

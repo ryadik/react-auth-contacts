@@ -1,4 +1,6 @@
-import React, {Component, useState} from "react";
+import React, {Component} from "react";
+
+import {withRouter} from 'react-router-dom'
 
 import VisualComposition from "./visual-composition/visual-composition";
 import ContactsItem from "./visual-composition/contacts-item/contacts-item";
@@ -9,18 +11,19 @@ import postData from "../../../service/postData";
 import deleteData from "../../../service/deleteData";
 import generateKey from "../../../service/generateKey";
 
-export default class ContactsPage extends Component {
+class ContactsPage extends Component {
 
   state = {
-    contacts: []
+    contacts: [],
+    searchInputValue: ''
   }
 
-  setContactActive = (key) => {
+  setContactToggleActive = (key) => {
     this.setState(({contacts}) => {
       const newArr = [...contacts]
 
       newArr.forEach(item => {
-        item.active = (item.key === key) ? item.active = true : item.active = false
+        item.active = (item.key === key) ? item.active = !item.active : item.active = false
       })
 
       return {
@@ -28,6 +31,14 @@ export default class ContactsPage extends Component {
       }
     })
   } // set contact active state
+
+  setSearchInputValue = (e) => {
+    const inputValue = e.target.value.trim()
+
+    this.setState({searchInputValue: inputValue})
+
+    console.log(this.state.searchInputValue)
+  }
 
   // CRUD JSON
   createNewContact = async (contactData, e) => {
@@ -89,19 +100,31 @@ export default class ContactsPage extends Component {
   } // delete contact // D
 
   componentDidMount() {
-    this.getContacts()
+    if (!this.props.isLogin) {
+      this.props.history.push('/')
+    } else {
+      this.getContacts()
+    }
   }
 
   render() {
-    const {contacts} = this.state
+    const {contacts, searchInputValue} = this.state
 
-    const contactsElems = (contacts.length > 0) ? contacts.map(item =>
+    const visibleContacts = (searchInputValue) ? contacts.filter(item => {
+      const str = `${item.firstName} ${item.secondName}`.toLowerCase()
+
+      if (str.search(searchInputValue.toLowerCase()) > -1) {
+        return item
+      }
+    }) : contacts
+
+    const contactsElems = (visibleContacts.length > 0) ? visibleContacts.map(item =>
         <ContactsItem id={item.key}
                       key={item.key}
                       imgAvatar={item.imgAvatar.trim()}
                       fullName={`${item.firstName} ${item.secondName}`}
                       viewMode={true}
-                      setContactActive={this.setContactActive}/>)
+                      setContactToggleActive={this.setContactToggleActive}/>)
 
       : null
 
@@ -121,6 +144,12 @@ export default class ContactsPage extends Component {
       }
     })
 
-    return <VisualComposition createNewContact={this.createNewContact} contacts={contactsElems} selected={selectedElem}/>
+    return <VisualComposition createNewContact={this.createNewContact}
+                              setSearchInputValue={this.setSearchInputValue}
+                              onLogout={this.props.onLogout}
+                              contacts={contactsElems}
+                              selected={selectedElem}/>
   }
 }
+
+export default withRouter(ContactsPage)
