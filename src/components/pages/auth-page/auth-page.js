@@ -2,6 +2,9 @@ import React, {Component} from "react";
 import {withRouter} from 'react-router-dom'
 
 class AuthPage extends Component {
+  constructor(props) {
+    super(props);
+  }
 
   state = {
     loginField: '',
